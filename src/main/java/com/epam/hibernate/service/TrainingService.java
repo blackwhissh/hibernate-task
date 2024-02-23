@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import java.io.NotActiveException;
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
+
+import static com.epam.hibernate.Utils.checkAdmin;
 
 @Service
 public class TrainingService {
@@ -31,21 +34,23 @@ public class TrainingService {
         this.trainingTypeRepository = trainingTypeRepository;
         this.userRepository = userRepository;
     }
+
     @Transactional
     public Training addTraining(@NotNull Trainer trainer, @NotNull Trainee trainee,
                                 @NotNull String trainingName, @NotNull TrainingTypeEnum trainingTypeEnum,
-                                @NotNull Date trainingDate, @NotNull Integer trainingDuration) throws NotActiveException, AuthenticationException {
-        userRepository.authenticate(trainer.getUser().getUsername(),trainer.getUser().getPassword());
-        if(!trainer.getUser().getActive() || !trainee.getUser().getActive()){
+                                @NotNull Date trainingDate, @NotNull Integer trainingDuration, @NotNull User admin) throws NotActiveException, AuthenticationException, AccessDeniedException {
+        checkAdmin(admin);
+        userRepository.authenticate(admin.getUsername(), admin.getPassword());
+        if (!trainer.getUser().getActive() || !trainee.getUser().getActive()) {
             throw new NotActiveException("Trainer/Trainee is not active");
         }
 
         TrainingType trainingType = trainingTypeRepository.selectByType(trainingTypeEnum);
-        if(trainer.getSpecialization().getTrainingTypeName() != trainingType.getTrainingTypeName()){
+        if (trainer.getSpecialization().getTrainingTypeName() != trainingType.getTrainingTypeName()) {
             throw new IllegalArgumentException("Trainer has not that specialization");
         }
 
-        Training training = new Training(trainer,trainee,trainingName,trainingType,trainingDate,trainingDuration);
+        Training training = new Training(trainer, trainee, trainingName, trainingType, trainingDate, trainingDuration);
 
         trainer.getTrainings().add(training);
         trainer.getTrainees().add(trainee);

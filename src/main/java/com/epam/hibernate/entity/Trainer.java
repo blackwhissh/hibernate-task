@@ -17,6 +17,7 @@ public class Trainer {
     private Long trainerId;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "specialization")
+    @Enumerated
     private TrainingType specialization;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
@@ -79,11 +80,13 @@ public class Trainer {
     public void setTrainings(List<Training> trainings) {
         this.trainings = trainings;
     }
-    public void addTraining(Training training){
+
+    public void addTraining(Training training) {
         trainings.add(training);
         training.setTrainer(this);
     }
-    public void removeTraining(Training training){
+
+    public void removeTraining(Training training) {
         trainings.remove(training);
         training.setTrainer(null);
     }

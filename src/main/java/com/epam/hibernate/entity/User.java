@@ -1,7 +1,6 @@
 package com.epam.hibernate.entity;
 
 import com.epam.hibernate.Utils;
-import com.epam.hibernate.repository.UserRepository;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,26 +8,28 @@ import jakarta.persistence.*;
 public class User {
     @Id
     @SequenceGenerator(name = "user_id_seq", allocationSize = 1)
-    @GeneratedValue(generator = "user_id_seq",strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "user_id_seq", strategy = GenerationType.SEQUENCE)
     @Column(name = "user_id")
     private Long userId;
     @Column(name = "first_name", nullable = false)
     private String firstName;
-    @Column(name = "last_name",nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-    @Column(name = "username",nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "is_active",nullable = false)
+    @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+    private RoleEnum role;
 
 
     public User() {
     }
 
-    public User(String firstName, String lastName, Boolean isActive) {
+    public User(String firstName, String lastName, Boolean isActive, RoleEnum role) {
         this.firstName = firstName;
+        this.role = role;
         this.lastName = lastName;
         this.isActive = isActive;
         this.password = Utils.generatePassword();
@@ -80,6 +81,14 @@ public class User {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public RoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(RoleEnum role) {
+        this.role = role;
     }
 
     @Override

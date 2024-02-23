@@ -1,5 +1,9 @@
 package com.epam.hibernate;
 
+import com.epam.hibernate.entity.RoleEnum;
+import com.epam.hibernate.entity.User;
+
+import java.nio.file.AccessDeniedException;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -20,7 +24,6 @@ public class Utils {
         }
         return sb.toString();
     }
-
     public static String generatePassword() {
         Random random = new Random();
         sb = new StringBuilder();
@@ -28,5 +31,10 @@ public class Utils {
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
         }
         return sb.toString();
+    }
+    public static void checkAdmin(User admin) throws AccessDeniedException {
+        if(admin.getRole() != RoleEnum.ADMIN){
+            throw new AccessDeniedException("You must be an admin");
+        }
     }
 }

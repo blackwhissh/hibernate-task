@@ -14,8 +14,9 @@ public class TrainingRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Transactional
-    public void save(Training training){
+    public Training save(Training training){
         entityManager.merge(training);
         logger.info("Training saved successfully");
+        return training;
     }
 }

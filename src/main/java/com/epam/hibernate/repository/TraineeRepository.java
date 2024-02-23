@@ -18,9 +18,9 @@ public class TraineeRepository {
     @PersistenceContext
     private EntityManager entityManager;
     @Transactional
-    public void save(Trainee trainee){
-        entityManager.merge(trainee);
+    public Trainee save(Trainee trainee){
         logger.info("Trainee saved successfully");
+        return entityManager.merge(trainee);
     }
 
     public Trainee selectByUsername(String username){

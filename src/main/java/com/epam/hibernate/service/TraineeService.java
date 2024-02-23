@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.epam.hibernate.Utils.checkAdmin;
 import static com.epam.hibernate.Utils.generateUsername;
 
 @Service
@@ -31,7 +33,7 @@ public class TraineeService {
     }
     public Trainee createProfile(@NotNull String firstName,@NotNull String lastName,@NotNull Boolean isActive,
                               Date dob, String address){
-        User traineeUser = new User(firstName,lastName,isActive);
+        User traineeUser = new User(firstName,lastName,isActive,RoleEnum.TRAINEE);
         if (!userRepository.usernameExists(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), false))){
             traineeUser.setUsername(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), false));
         }else {
@@ -41,8 +43,13 @@ public class TraineeService {
         traineeRepository.save(trainee);
         return trainee;
     }
-    public Trainee selectProfile(String newUsername, @NotNull User currentUser) throws AuthenticationException {
-        userRepository.authenticate(currentUser.getUsername(),currentUser.getPassword());
+    public Trainee selectCurrentTraineeProfile(@NotNull Trainee currentTrainee) throws AuthenticationException {
+        userRepository.authenticate(currentTrainee.getUser().getUsername(),currentTrainee.getUser().getPassword());
+        return traineeRepository.selectByUsername(currentTrainee.getUser().getUsername());
+    }
+    public Trainee selectProfile(String newUsername, @NotNull User admin) throws AuthenticationException, AccessDeniedException {
+        checkAdmin(admin);
+        userRepository.authenticate(admin.getUsername(),admin.getPassword());
         return traineeRepository.selectByUsername(newUsername);
     }
     public void changePassword(@NotNull String newPassword,@NotNull Trainee currentTrainee) throws AuthenticationException {
@@ -60,14 +67,16 @@ public class TraineeService {
             currentTrainee.setAddress(address);
         }
     }
-    public void activateDeactivate(@NotNull Trainee currentTrainee) throws AuthenticationException {
-        userRepository.authenticate(currentTrainee.getUser().getUsername(),currentTrainee.getUser().getPassword());
+    public void activateDeactivate(@NotNull Trainee currentTrainee, @NotNull User admin) throws AuthenticationException, AccessDeniedException {
+        checkAdmin(admin);
+        userRepository.authenticate(admin.getUsername(),admin.getPassword());
         currentTrainee.getUser().setActive(!currentTrainee.getUser().getActive());
         userRepository.activateDeactivate(currentTrainee.getUser().getActive(), currentTrainee.getUser().getUserId());
     }
     @Transactional
-    public void deleteTrainee(@NotNull String username, @NotNull Trainee currentTrainee) throws AuthenticationException {
-        userRepository.authenticate(currentTrainee.getUser().getUsername(), currentTrainee.getUser().getPassword());
+    public void deleteTrainee(@NotNull String username, @NotNull User admin) throws AuthenticationException, AccessDeniedException {
+        checkAdmin(admin);
+        userRepository.authenticate(admin.getUsername(), admin.getPassword());
         traineeRepository.deleteTrainee(username);
     }
     @Transactional
@@ -90,6 +99,5 @@ public class TraineeService {
         }
         return notAssignedTrainers;
     }
-    
 
 }

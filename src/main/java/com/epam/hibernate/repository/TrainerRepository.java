@@ -17,10 +17,9 @@ public class TrainerRepository {
     private static final Logger logger = Logger.getLogger(TrainerRepository.class.getName());
     @PersistenceContext
     private EntityManager entityManager;
-    @Transactional
-    public void save(Trainer trainer){
-        entityManager.merge(trainer);
+    public Trainer save(Trainer trainer){
         logger.info("Trainer saved successfully");
+        return entityManager.merge(trainer);
     }
     public Trainer selectByUsername(String username){
         Trainer trainer;
@@ -37,9 +36,10 @@ public class TrainerRepository {
         return trainer;
     }
     @Transactional
-    public void updateTrainer(TrainingType newSpecialization){
-        entityManager.createQuery("update Trainer t set t.specialization = :newSpec")
+    public void updateTrainer(TrainingType newSpecialization, Long trainerId){
+        entityManager.createQuery("update Trainer t set t.specialization = :newSpec where trainerId = :trainerId")
                 .setParameter("newSpec", newSpecialization)
+                .setParameter("trainerId",trainerId)
                 .executeUpdate();
         logger.info("Trainer specialization updated successfully");
     }
