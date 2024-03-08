@@ -17,6 +17,7 @@ public class TrainerRepository {
     private static final Logger logger = Logger.getLogger(TrainerRepository.class.getName());
     @PersistenceContext
     private EntityManager entityManager;
+    @Transactional
     public Trainer save(Trainer trainer){
         logger.info("Trainer saved successfully");
         return entityManager.merge(trainer);
