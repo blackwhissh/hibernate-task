@@ -59,7 +59,7 @@ public class TraineeService {
     }
     public void updateTrainee(Date dob, String address, @NotNull Trainee currentTrainee) throws AuthenticationException {
         userRepository.authenticate(currentTrainee.getUser().getUsername(), currentTrainee.getUser().getPassword());
-        traineeRepository.updateTrainee(dob, address);
+        traineeRepository.updateTrainee(currentTrainee.getUser().getUsername(),dob, address);
         if(dob != null){
             currentTrainee.setDob(dob);
         }

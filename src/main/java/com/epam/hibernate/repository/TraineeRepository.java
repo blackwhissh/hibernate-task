@@ -38,16 +38,18 @@ public class TraineeRepository {
         return trainee;
     }
     @Transactional
-    public void updateTrainee(Date dob, String address){
+    public void updateTrainee(String username,Date dob, String address){
         if(dob != null){
-            entityManager.createQuery("update Trainee t set t.dob = :dob")
+            entityManager.createQuery("update Trainee t set t.dob = :dob where t.user.username = :username")
                     .setParameter("dob", dob)
+                    .setParameter("username", username)
                     .executeUpdate();
             logger.info("Trainee date of birth updated successfully");
         }
         if(address != null){
-            entityManager.createQuery("update Trainee t set t.address = :address")
+            entityManager.createQuery("update Trainee t set t.address = :address where t.user.username = :username")
                     .setParameter("address", address)
+                    .setParameter("username", username)
                     .executeUpdate();
             logger.info("Trainee address updated successfully");
         }
